@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -42,12 +42,14 @@ async signin(userSignInDto:UserSignInDto):Promise<UserEntity> {
     return 'This action adds a new user';
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll(): Promise<UserEntity[]>{
+    return await this.usersRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: number):Promise<UserEntity>{
+   const user = await this.usersRepository.findOneBy({id});
+   if(!user) throw new NotFoundException('Usuário não encontrado.')
+    return user;
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {

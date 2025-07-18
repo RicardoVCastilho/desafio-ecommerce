@@ -35,14 +35,14 @@ async signin(@Body() UserSignInDto:UserSignUpDto): Promise<{
     return 'Olá mundo!'
   }
 
-  @Get()
-  findAll() {
-    return this.usersService.findAll();
+  @Get('all')
+  async findAll(): Promise<UserEntity[]>{
+    return await this.usersService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  @Get('single/:id')
+  async findOne(@Param('id') id: string):Promise<UserEntity> {
+    return await this.usersService.findOne(+id);
   }
 
   @Patch(':id')
