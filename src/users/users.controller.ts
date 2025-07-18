@@ -4,6 +4,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserSignUpDto } from './dto/user-signup.dto';
 import { UserEntity } from './entities/user.entity';
+import { UserSignInDto } from './dto/user-signin.dto';
+import { access } from 'fs';
 
 @Controller('users')
 export class UsersController {
@@ -13,6 +15,17 @@ export class UsersController {
 async signup(@Body() userSignUpDto: UserSignUpDto): Promise<{ user: Partial<UserEntity> }> {
   const user = await this.usersService.signup(userSignUpDto);
   return { user };
+}
+
+@Post('signin')
+async signin(@Body() UserSignInDto:UserSignUpDto): Promise<{
+  accessToken: string;
+  user: UserEntity; 
+}>{
+  const user = await this.usersService.signin(UserSignInDto);
+  const accessToken = await this.usersService.accessToken(user);
+
+  return {accessToken, user}
 }
 
 
