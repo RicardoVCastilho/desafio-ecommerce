@@ -1,12 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserSignUpDto } from './dto/user-signup.dto';
 import { UserEntity } from './entities/user.entity';
 import { UserSignInDto } from './dto/user-signin.dto';
-import { access } from 'fs';
 import { CurrentUser } from 'src/utility/decorators/current-user.decorator';
+import { AuthenticationGuard } from 'src/utility/guards/authentication.guard';
+import { AuthorizeGuard } from 'src/utility/guards/authorization.guard';
+import { AuthorizeRoles } from 'src/utility/decorators/authorize-roles.decorator';
+import { UserRole } from '../../src/utility/common/user-roles.enum'; 
+
 
 @Controller('users')
 export class UsersController {
@@ -19,7 +23,7 @@ async signup(@Body() userSignUpDto: UserSignUpDto): Promise<{ user: Partial<User
 }
 
 @Post('signin')
-async signin(@Body() UserSignInDto:UserSignUpDto): Promise<{
+async signin(@Body() UserSignInDto:UserSignInDto): Promise<{
   accessToken: string;
   user: UserEntity; 
 }>{
@@ -29,13 +33,14 @@ async signin(@Body() UserSignInDto:UserSignUpDto): Promise<{
   return {accessToken, user}
 }
 
-
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     // return this.usersService.create(createUserDto);
     return 'Olá mundo!'
   }
 
+  @AuthorizeRoles(UserRole.ADMIN)
+  @UseGuards(AuthenticationGuard, AuthorizeGuard)
   @Get('all')
   async findAll(): Promise<UserEntity[]>{
     return await this.usersService.findAll();
@@ -56,6 +61,7 @@ async signin(@Body() UserSignInDto:UserSignUpDto): Promise<{
     return this.usersService.remove(+id);
   }
 
+  @UseGuards(AuthenticationGuard)
   @Get('me')
   getProfile(@CurrentUser () currentUser:UserEntity){
     return currentUser;
