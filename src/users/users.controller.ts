@@ -39,8 +39,8 @@ async signin(@Body() UserSignInDto:UserSignInDto): Promise<{
     return 'Olá mundo!'
   }
 
-  @AuthorizeRoles(UserRole.ADMIN)
-  @UseGuards(AuthenticationGuard, AuthorizeGuard)
+  //@AuthorizeRoles(UserRole.ADMIN)
+  @UseGuards(AuthenticationGuard, AuthorizeGuard([UserRole.ADMIN]))
   @Get('all')
   async findAll(): Promise<UserEntity[]>{
     return await this.usersService.findAll();

@@ -1,36 +1,24 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException, Type, mixin } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
-@Injectable()
-export class AuthorizeGuard implements CanActivate {
-  constructor(private reflector: Reflector) {}
+export function AuthorizeGuard(allowedRoles: string[]): Type<CanActivate> {
+  @Injectable()
+  class RolesGuardMixin implements CanActivate {
+    canActivate(context: ExecutionContext): boolean {
+      const request = context.switchToHttp().getRequest();
+      const userRoles: string[] = request?.currentUser?.role;
 
-  canActivate(context: ExecutionContext): boolean {
-    const allowedRoles = this.reflector.get<string[]>(
-      'allowedRoles',
-      context.getHandler(),
-    );
+      if (!userRoles || userRoles.length === 0) {
+        throw new UnauthorizedException('Usuário sem papéis definidos.');
+      }
 
-    if (!allowedRoles || allowedRoles.length === 0) {
-      return true;
+      const hasAccess = userRoles.some((role) => allowedRoles.includes(role));
+
+      if (hasAccess) return true;
+
+      throw new UnauthorizedException('Desculpe, você não está autorizado.');
     }
-
-    const request = context.switchToHttp().getRequest();
-    const userRoles: string[] = request?.currentUser?.role;
-
-
-    if (!userRoles || userRoles.length === 0) {
-      throw new UnauthorizedException('Usuário sem papéis definidos.');
-    }
-
-    const hasAccess = userRoles.some((role) =>
-      allowedRoles.includes(role),
-    );
-
-    if (hasAccess) return true;
-
-    throw new UnauthorizedException(
-      'Desculpe, você não está autorizado.',
-    );
   }
+
+  return mixin(RolesGuardMixin);
 }
