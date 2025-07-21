@@ -3,29 +3,38 @@ import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, Timestamp, Up
 
 @Entity('users')
 export class UserEntity {
-@PrimaryGeneratedColumn()
-id:number;
+    @PrimaryGeneratedColumn()
+    id: number;
 
-@Column()
-name:string;
+    @Column()
+    name: string;
 
-@Column({unique:true})
-email:string;
+    @Column({ unique: true })
+    email: string;
 
-@Column({select:false})
-password:string;
+    @Column({ select: false })
+    password: string;
 
-@Column({
-    type: 'enum',
-    enum:UserRole,
-    array:true,
-    default:[UserRole.CLIENT]
-})
-role: UserRole[];
+    @Column({
+        type: 'enum',
+        enum: UserRole,
+        array: true,
+        default: [UserRole.CLIENT]
+    })
+    role: UserRole[];
 
-@CreateDateColumn()
-createdAt:Timestamp;
+    @Column({ default: false })
+    isEmailConfirmed: boolean;
 
-@UpdateDateColumn()
-updatedAt:Timestamp;
+    @Column({ type: 'varchar', nullable: true })
+    emailConfirmationToken: string | null;
+
+    @Column({ type: 'timestamp', nullable: true })
+    emailConfirmationTokenExpires: Date | null;
+
+    @CreateDateColumn()
+    createdAt: Timestamp;
+
+    @UpdateDateColumn()
+    updatedAt: Timestamp;
 }
