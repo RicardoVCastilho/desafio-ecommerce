@@ -3,7 +3,7 @@ import { IsArray, IsNotEmpty, IsNumber, IsPositive, IsString, Min } from "class-
 export class CreateProductDto {
     @IsNotEmpty({ message: 'O título do produto não pode estar vazio.' })
     @IsString()
-    title: string;
+    name: string;
 
     @IsNotEmpty({ message: 'A descrição do produto não pode estar vazio(a).' })
     @IsString()
@@ -25,5 +25,5 @@ export class CreateProductDto {
 
     @IsNotEmpty({ message: 'A categoria não pode estar vazio(a).' })
     @IsNumber({}, { message: 'Id da categoria deve ser um número.' })
-    category: number;
+    categoryId: number;
 }

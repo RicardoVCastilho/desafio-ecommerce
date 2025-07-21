@@ -1,12 +1,37 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ProductEntity } from './entities/product.entity';
+import { Repository } from 'typeorm';
+import { CategoriesService } from 'src/categories/categories.service';
+import { UserEntity } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class ProductsService {
-  create(createProductDto: CreateProductDto) {
-    return 'This action adds a new product';
+  constructor(@InjectRepository(ProductEntity) private readonly productRepository: Repository<ProductEntity>,
+private readonly categoryService:CategoriesService
+  ) { }
+
+async create(
+  createProductDto: CreateProductDto,
+  currentUser: UserEntity,
+): Promise<ProductEntity> {
+  const category = await this.categoryService.findOne(+createProductDto.categoryId);
+
+  if (!category) {
+    throw new NotFoundException('Categoria não encontrada.');
   }
+
+  const product = this.productRepository.create({
+    ...createProductDto,
+    addedBy: currentUser,
+    category: category,
+  });
+
+  return await this.productRepository.save(product);
+}
+
 
   findAll() {
     return `This action returns all products`;
