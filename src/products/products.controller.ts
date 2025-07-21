@@ -19,19 +19,20 @@ export class ProductsController {
     return await this.productsService.create(createProductDto, currentUser);
   }
 
-  @Get()
-  findAll() {
-    return this.productsService.findAll();
+  @Get('all')
+  async findAll():Promise<ProductEntity[]> {
+    return await this.productsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.productsService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    return await this.productsService.findOne(+id);
   }
 
+  @UseGuards(AuthenticationGuard, AuthorizeGuard([UserRole.ADMIN]))
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-    return this.productsService.update(+id, updateProductDto);
+  async update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto, @CurrentUser()currentUser:UserEntity): Promise<ProductEntity>{
+    return await this.productsService.update(+id, updateProductDto, currentUser);
   }
 
   @Delete(':id')
