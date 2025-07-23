@@ -42,7 +42,6 @@ export class UsersController {
     };
   }
 
-
   @Post('signin')
   @ApiOperation({ summary: 'Login com autenticação do usuário' })
   @ApiResponse({

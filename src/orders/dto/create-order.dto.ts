@@ -9,7 +9,7 @@ export class CreateOrderDto {
   clientId: number;
 
   @IsEnum(OrderStatus, { message: 'Status inválido.' })
-  status?: OrderStatus; // pode ser opcional, com default no service
+  status?: OrderStatus; 
 
   @IsNumber({}, { message: 'O total deve ser um número.' })
   total: number;

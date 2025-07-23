@@ -23,7 +23,6 @@ export class SalesReportsService {
   async create(createSalesReportDto: CreateSalesReportDto): Promise<SalesReportEntity> {
     const { startDate, endDate, clientId, productId, status } = createSalesReportDto;
 
-    // Monta o filtro dinâmico para a query de pedidos
     const whereConditions: FindOptionsWhere<OrderEntity> = {};
 
     if (startDate && endDate) {
@@ -42,7 +41,6 @@ export class SalesReportsService {
       whereConditions.status = status;
     }
 
-    // Busca pedidos com filtros, incluindo itens e produtos relacionados
     const orders = await this.orderRepo.find({
       where: whereConditions,
       relations: ['items', 'items.product', 'client'],
@@ -55,7 +53,6 @@ export class SalesReportsService {
     let totalSales = 0;
     let productsSold = 0;
 
-    // Aplica filtro de produto nos itens, se necessário
     const filteredOrders = productId
       ? orders.map(order => ({
         ...order,
@@ -112,7 +109,6 @@ export class SalesReportsService {
       throw new InternalServerErrorException('Erro ao gerar o arquivo CSV.');
     }
 
-    // Use o período do filtro (startDate) para o campo period, ou a data atual se não informado
     const reportPeriod = startDate ? new Date(startDate) : new Date();
 
     const report = this.salesReportRepo.create({
