@@ -13,8 +13,7 @@
 - Bcrypt: Biblioteca para hashear senhas de forma segura, protegendo dados sensíveis;
 - Nodemailer: Biblioteca para enviar e-mails programaticamente a partir do Node.js;
 - CSV-writer: Biblioteca para gerar arquivos CSV a partir de dados estruturados;
-- Swagger: Ferramenta para gerar documentação interativa da API, facilitando testes e integração;
-- Render: Plataforma para deploy fácil e rápido da API na web.
+- Swagger: Ferramenta para gerar documentação interativa da API, facilitando testes e integração.
 
 ## ⚙️ Estrutura do projeto
 
