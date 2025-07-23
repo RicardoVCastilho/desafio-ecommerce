@@ -13,6 +13,7 @@
 - Bcrypt: Biblioteca para hashear senhas de forma segura, protegendo dados sensíveis;
 - Nodemailer: Biblioteca para enviar e-mails programaticamente a partir do Node.js;
 - CSV-writer: Biblioteca para gerar arquivos CSV a partir de dados estruturados;
+- Jest: Testes Unitários automatizados;
 - Swagger: Ferramenta para gerar documentação interativa da API, facilitando testes e integração.
 
 ## ⚙️ Estrutura do projeto
@@ -85,7 +86,7 @@ ecommerce-desafio/
 │   ├── app.module.ts              # Módulo principal da aplicação
 │   └── main.ts                    # Arquivo de bootstrap da aplicação
 │
-├── test/                          # Testes automatizados
+├── test/                          # Testes automatizados end 2 end (padrão do NestJS)
 ├── .env                           # Variáveis de ambiente
 ├── .gitignore                     # Arquivos e pastas ignorados pelo Git
 ├── .prettierrc                    # Configuração do Prettier
@@ -96,6 +97,55 @@ ecommerce-desafio/
 ├── README.md                      # Documentação do projeto
 ├── tsconfig.build.json            # Configuração do TypeScript para build
 └── tsconfig.json                  # Configuração principal do TypeScript
+```
+
+## 📋 Como Rodar a API Localmente
+
+```bash
+1 - Clone o repositório:
+
+2 - git clone https://github.com/SEU_USUARIO/softpet-api.git
+
+3 - cd ecommerce-desafio
+
+4 - Instale as dependências:
+
+npm install
+# ou
+yarn install
+
+5 - Configure o arquivo .env:
+Crie um arquivo .env na raiz do projeto com as variáveis de ambiente:
+
+env
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=postgres
+DB_PASSWORD=SUASENHAAQUI
+
+DB_DATABASE=nome_do_banco
+
+ACCESS_TOKEN_SECRET_KEY=SUA_CHAVE_SECRETA_AQUI
+ACCESS_TOKEN_EXPIRE_TIME=30m
+
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=seu-email@gmail.com
+SMTP_PASS=SENHA_DO_EMAIL
+
+APP_URL=http://localhost:3000
+
+6 - Substitua os valores pelos correspondentes ao seu banco de dados PostgreSQL;
+
+7 - Inicie o servidor:
+
+npm run start
+# ou
+yarn start
+
+A API estará rodando em http://localhost:3000.
+
+8 - Ao rodar o servidor, acesse a documentação da API para conferir todas as rotas em: http://localhost:3000/api/docs#/.
 ```
 
 ## 🧑‍💻 Entidades Principais
@@ -120,15 +170,16 @@ Itens específicos de cada pedido, incluindo o produto, quantidade, preço unit�
 7 - Relatórios de Vendas:
 Gera relatórios com dados agregados de vendas, podendo ser baixados em arquivos CSV para análise.
 
-## 📋 Principais Endpoints da API
+## 📋 Principais Endpoints da API - Todos devidamente autenticados
 
 ### 👤 Usuários
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
 | `POST` | `/api/v1/users/signup` | Cadastro de novo usuário |
 | `POST` | `/api/v1/users/signin` | Login do usuário |
-| `GET` | `/api/v1/users` | Listar todos os usuários |
-| `GET` | `/api/v1/users/:id` | Buscar usuário por ID |
+| `GET` | `/api/v1/users/all` | Listar todos os usuários |
+| `GET` | `/api/v1/users/single/:id` | Buscar usuário por ID |
+| `GET` | `/api/v1/users/:confirm-email` | Confirma o e-mail do usuário |
 | `PATCH` | `/api/v1/users/:id` | Atualizar dados do usuário |
 | `DELETE` | `/api/v1/users/:id` | Deletar usuário |
 
@@ -137,9 +188,9 @@ Gera relatórios com dados agregados de vendas, podendo ser baixados em arquivos
 ### 🧾 Clientes
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
-| `GET` | `/api/v1/clients` | Listar clientes |
+| `GET` | `/api/v1/clients/all` | Listar todos os clientes |
 | `POST` | `/api/v1/clients` | Cadastrar cliente |
-| `GET` | `/api/v1/clients/:id` | Buscar cliente por ID |
+| `GET` | `/api/v1/clients/single/:id` | Buscar cliente por ID |
 | `PATCH` | `/api/v1/clients/:id` | Atualizar cliente |
 | `DELETE` | `/api/v1/clients/:id` | Deletar cliente |
 
@@ -148,9 +199,9 @@ Gera relatórios com dados agregados de vendas, podendo ser baixados em arquivos
 ### 🗂️ Categorias
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
-| `GET` | `/api/v1/categories` | Listar categorias |
+| `GET` | `/api/v1/categories/all` | Listar categorias |
 | `POST` | `/api/v1/categories` | Cadastrar categoria |
-| `GET` | `/api/v1/categories/:id` | Buscar categoria por ID |
+| `GET` | `/api/v1/categories/single/:id` | Buscar categoria por ID |
 | `PATCH` | `/api/v1/categories/:id` | Atualizar categoria |
 | `DELETE` | `/api/v1/categories/:id` | Deletar categoria |
 
@@ -159,9 +210,9 @@ Gera relatórios com dados agregados de vendas, podendo ser baixados em arquivos
 ### 📦 Produtos
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
-| `GET` | `/api/v1/products` | Listar produtos |
+| `GET` | `/api/v1/products/all` | Listar produtos |
 | `POST` | `/api/v1/products` | Cadastrar produto |
-| `GET` | `/api/v1/products/:id` | Buscar produto por ID |
+| `GET` | `/api/v1/products/single/:id` | Buscar produto por ID |
 | `PATCH` | `/api/v1/products/:id` | Atualizar produto |
 | `DELETE` | `/api/v1/products/:id` | Deletar produto |
 
@@ -170,9 +221,9 @@ Gera relatórios com dados agregados de vendas, podendo ser baixados em arquivos
 ### 🧾 Pedidos
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
-| `GET` | `/api/v1/orders` | Listar pedidos |
+| `GET` | `/api/v1/orders/all` | Listar pedidos |
 | `POST` | `/api/v1/orders` | Criar pedido |
-| `GET` | `/api/v1/orders/:id` | Buscar pedido por ID |
+| `GET` | `/api/v1/orders/single/:id` | Buscar pedido por ID |
 | `PATCH` | `/api/v1/orders/:id` | Atualizar pedido |
 | `DELETE` | `/api/v1/orders/:id` | Deletar pedido |
 
@@ -182,8 +233,9 @@ Gera relatórios com dados agregados de vendas, podendo ser baixados em arquivos
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
 | `POST` | `/api/v1/sales-reports` | Gerar relatório de vendas (CSV) |
-| `GET` | `/api/v1/sales-reports` | Listar relatórios gerados |
-| `GET` | `/api/v1/sales-reports/download/:id` | Fazer download de um relatório CSV |
+| `GET` | `/api/v1/sales-reports/all` | Listar relatórios gerados |
+| `GET` | `/api/v1/sales-reports/:id/download` | Fazer download de um relatório CSV |
+| `GET` | `/api/v1/sales-reports/single/:id` | Lista um único relatório |
 
 ## 📌 Principais functionalidades
 
