@@ -8,9 +8,10 @@ import { ProductsModule } from './products/products.module';
 import { ClientsModule } from './clients/clients.module';
 import { OrdersModule } from './orders/orders.module';
 import { OrderItemsModule } from './order-items/order-items.module';
+import { SalesReportsModule } from './sales_reports/sales_reports.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(dataSourceOptions), UsersModule, CategoriesModule, ProductsModule, ClientsModule, OrdersModule, OrderItemsModule],
+  imports: [TypeOrmModule.forRoot(dataSourceOptions), UsersModule, CategoriesModule, ProductsModule, ClientsModule, OrdersModule, OrderItemsModule, SalesReportsModule],
   controllers: [],
   providers: [],
 })
