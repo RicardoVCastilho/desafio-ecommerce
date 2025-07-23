@@ -1,6 +1,6 @@
-import { ClientEntity } from "src/clients/entities/clients.entity";
-import { OrderItemEntity } from "src/order-items/entities/order-item.entity";
-import { OrderStatus } from "src/utility/common/order-status.enum";
+import { ClientEntity } from "../../clients/entities/clients.entity";
+import { OrderItemEntity } from "../../order-items/entities/order-item.entity";
+import { OrderStatus } from "../../utility/common/order-status.enum";
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, BeforeInsert, BeforeUpdate } from "typeorm";
 
 @Entity({ name: 'orders' })

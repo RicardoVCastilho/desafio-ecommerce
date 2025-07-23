@@ -1,6 +1,6 @@
-import { CategoryEntity } from "src/categories/entities/category.entity";
-import { ProductEntity } from "src/products/entities/product.entity";
-import { UserRole } from "src/utility/common/user-roles.enum";
+import { CategoryEntity } from "../../categories/entities/category.entity";
+import { ProductEntity } from "../../products/entities/product.entity";
+import { UserRole } from "../../utility/common/user-roles.enum";
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, Timestamp, UpdateDateColumn } from "typeorm";
 
 @Entity('users')

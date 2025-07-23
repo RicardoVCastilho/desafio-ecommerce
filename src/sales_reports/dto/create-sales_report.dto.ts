@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsNumber, IsEnum, IsString } from 'class-validator';
-import { OrderStatus } from 'src/utility/common/order-status.enum';
+import { OrderStatus } from '../../utility/common/order-status.enum';
 
 export class CreateSalesReportDto {
   @ApiPropertyOptional({ example: '2025-07-01', description: 'Data de início' })

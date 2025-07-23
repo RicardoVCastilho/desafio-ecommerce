@@ -4,8 +4,8 @@ import { Repository } from 'typeorm';
 import { OrderItemEntity } from './entities/order-item.entity';
 import { CreateOrderItemDto } from './dto/create-order-item.dto';
 import { UpdateOrderItemDto } from './dto/update-order-item.dto';
-import { ProductEntity } from 'src/products/entities/product.entity';
-import { OrderEntity } from 'src/orders/entities/order.entity';
+import { ProductEntity } from '../products/entities/product.entity';
+import { OrderEntity } from '../orders/entities/order.entity';
 
 @Injectable()
 export class OrderItemsService {

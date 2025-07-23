@@ -4,9 +4,9 @@ import { OrderItemsService } from './order-items.service';
 import { CreateOrderItemDto } from './dto/create-order-item.dto';
 import { UpdateOrderItemDto } from './dto/update-order-item.dto';
 import { OrderItemEntity } from './entities/order-item.entity';
-import { AuthenticationGuard } from 'src/utility/guards/authentication.guard';
-import { AuthorizeGuard } from 'src/utility/guards/authorization.guard';
-import { UserRole } from 'src/utility/common/user-roles.enum';
+import { AuthenticationGuard } from '../utility/guards/authentication.guard';
+import { AuthorizeGuard } from '../utility/guards/authorization.guard';
+import { UserRole } from '../utility/common/user-roles.enum';
 
 @ApiTags('Itens do Pedido')
 @Controller('order-items')

@@ -4,11 +4,11 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { OrderEntity } from './entities/order.entity';
-import { AuthenticationGuard } from 'src/utility/guards/authentication.guard';
-import { AuthorizeGuard } from 'src/utility/guards/authorization.guard';
-import { CurrentUser } from 'src/utility/decorators/current-user.decorator';
-import { UserEntity } from 'src/users/entities/user.entity';
-import { UserRole } from 'src/utility/common/user-roles.enum';
+import { AuthenticationGuard } from '../utility/guards/authentication.guard';
+import { AuthorizeGuard } from '../utility/guards/authorization.guard';
+import { CurrentUser } from '../utility/decorators/current-user.decorator';
+import { UserEntity } from '../users/entities/user.entity';
+import { UserRole } from '../utility/common/user-roles.enum';
 import { ClientsService } from '../clients/clients.service';
 
 @ApiTags('Pedidos')

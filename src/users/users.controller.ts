@@ -7,8 +7,8 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UserEntity } from './entities/user.entity';
 import { AuthenticationGuard } from '../../src/utility/guards/authentication.guard';
 import { AuthorizeGuard } from '../../src/utility/guards/authorization.guard';
-import { UserRole } from 'src/utility/common/user-roles.enum';
-import { CurrentUser } from 'src/utility/decorators/current-user.decorator';
+import { UserRole } from '../utility/common/user-roles.enum';
+import { CurrentUser } from '../utility/decorators/current-user.decorator';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Usuários')

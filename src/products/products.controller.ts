@@ -2,11 +2,11 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Http
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { AuthenticationGuard } from 'src/utility/guards/authentication.guard';
-import { UserRole } from 'src/utility/common/user-roles.enum';
-import { AuthorizeGuard } from 'src/utility/guards/authorization.guard';
-import { CurrentUser } from 'src/utility/decorators/current-user.decorator';
-import { UserEntity } from 'src/users/entities/user.entity';
+import { AuthenticationGuard } from '../utility/guards/authentication.guard';
+import { UserRole } from '../utility/common/user-roles.enum';
+import { AuthorizeGuard } from '../utility/guards/authorization.guard';
+import { CurrentUser } from '../utility/decorators/current-user.decorator';
+import { UserEntity } from '../users/entities/user.entity';
 import { ProductEntity } from './entities/product.entity';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 

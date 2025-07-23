@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsNumber, IsEnum, ValidateNested, IsArray } from 'class-validator';
 import { Type } from 'class-transformer';
 import { CreateOrderItemDto } from '../../order-items/dto/create-order-item.dto'; // import do DTO dos itens
-import { OrderStatus } from 'src/utility/common/order-status.enum';
+import { OrderStatus } from '../../utility/common/order-status.enum';
 
 export class CreateOrderDto {
   @IsNotEmpty({ message: 'O ID do cliente é obrigatório.' })

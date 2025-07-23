@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Post,
-  Body,
-  Get,
-  Param,
-  NotFoundException,
-  Res,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, NotFoundException, Res, UseGuards} from '@nestjs/common';
 import { SalesReportsService } from './sales_reports.service';
 import { CreateSalesReportDto } from './dto/create-sales_report.dto';
 import { Response } from 'express';
