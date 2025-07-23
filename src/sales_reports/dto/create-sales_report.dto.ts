@@ -1,20 +1,30 @@
-import { IsDateString, IsNotEmpty } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsOptional, IsNumber, IsEnum, IsString } from 'class-validator';
+import { OrderStatus } from 'src/utility/common/order-status.enum';
 
 export class CreateSalesReportDto {
-  @ApiProperty({
-    example: '2025-07-01',
-    description: 'Data de início do período do relatório (caso queira enviar horário: formato ISO).',
-  })
-  @IsNotEmpty({ message: 'É obrigatório preencher uma data inicial para o relatório.' })
-  @IsDateString()
-  startDate: string;
+  @ApiPropertyOptional({ example: '2025-07-01', description: 'Data de início' })
+  @IsOptional()
+  @IsString()
+  startDate?: string;
 
-  @ApiProperty({
-    example: '2025-07-31',
-    description: 'Data de término do período do relatório (caso queira enviar horário: formato ISO).',
-  })
-  @IsNotEmpty({ message: 'É obrigatório preencher uma data final para o relatório.' })
-  @IsDateString()
-  endDate: string;
+  @ApiPropertyOptional({ example: '2025-07-31', description: 'Data de término' })
+  @IsOptional()
+  @IsString()
+  endDate?: string;
+
+  @ApiPropertyOptional({ example: 5, description: 'ID do cliente' })
+  @IsOptional()
+  @IsNumber()
+  clientId?: number;
+
+  @ApiPropertyOptional({ example: 12, description: 'ID do produto' })
+  @IsOptional()
+  @IsNumber()
+  productId?: number;
+
+  @ApiPropertyOptional({ example: OrderStatus.PAID, enum: OrderStatus, description: 'Status do pedido' })
+  @IsOptional()
+  @IsEnum(OrderStatus)
+  status?: OrderStatus;
 }

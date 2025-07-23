@@ -1,6 +1,6 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between } from 'typeorm';
+import { Repository, Between, MoreThanOrEqual, LessThanOrEqual, FindOptionsWhere } from 'typeorm';
 import { SalesReportEntity } from './entities/sales_report.entity';
 import { CreateSalesReportDto } from './dto/create-sales_report.dto';
 import { OrderEntity } from 'src/orders/entities/order.entity';
@@ -18,31 +18,55 @@ export class SalesReportsService {
 
     @InjectRepository(OrderEntity)
     private readonly orderRepo: Repository<OrderEntity>,
-
-    @InjectRepository(OrderItemEntity)
-    private readonly orderItemRepo: Repository<OrderItemEntity>,
   ) { }
 
   async create(createSalesReportDto: CreateSalesReportDto): Promise<SalesReportEntity> {
-    const { startDate, endDate } = createSalesReportDto;
+    const { startDate, endDate, clientId, productId, status } = createSalesReportDto;
 
-    // Busca pedidos pagos dentro do período com itens e produtos relacionados
+    // Monta o filtro dinâmico para a query de pedidos
+    const whereConditions: FindOptionsWhere<OrderEntity> = {};
+
+    if (startDate && endDate) {
+      whereConditions.orderDate = Between(new Date(startDate), new Date(endDate));
+    } else if (startDate) {
+      whereConditions.orderDate = MoreThanOrEqual(new Date(startDate));
+    } else if (endDate) {
+      whereConditions.orderDate = LessThanOrEqual(new Date(endDate));
+    }
+
+    if (clientId) {
+      whereConditions.client = { id: clientId };
+    }
+
+    if (status) {
+      whereConditions.status = status;
+    }
+
+    // Busca pedidos com filtros, incluindo itens e produtos relacionados
     const orders = await this.orderRepo.find({
-      where: {
-        orderDate: Between(new Date(startDate), new Date(endDate)),
-        status: OrderStatus.PAID,
-      },
-      relations: ['items', 'items.product'],
+      where: whereConditions,
+      relations: ['items', 'items.product', 'client'],
     });
 
     if (!orders.length) {
-      throw new NotFoundException('Nenhuma venda encontrada no período informado.');
+      throw new NotFoundException('Nenhuma venda encontrada com os filtros informados.');
     }
 
     let totalSales = 0;
     let productsSold = 0;
 
-    // Define tipo para o CSV para o TypeScript
+    // Aplica filtro de produto nos itens, se necessário
+    const filteredOrders = productId
+      ? orders.map(order => ({
+        ...order,
+        items: order.items.filter(item => item.product.id === productId),
+      })).filter(order => order.items.length > 0)
+      : orders;
+
+    if (!filteredOrders.length) {
+      throw new NotFoundException('Nenhum item de venda encontrado para o produto informado.');
+    }
+
     const csvData: {
       orderId: number;
       productId: number;
@@ -51,7 +75,7 @@ export class SalesReportsService {
       createdAt: string;
     }[] = [];
 
-    for (const order of orders) {
+    for (const order of filteredOrders) {
       for (const item of order.items) {
         totalSales += Number(item.subtotal);
         productsSold += item.quantity;
@@ -88,9 +112,11 @@ export class SalesReportsService {
       throw new InternalServerErrorException('Erro ao gerar o arquivo CSV.');
     }
 
-    // Cria o registro do relatório no banco
+    // Use o período do filtro (startDate) para o campo period, ou a data atual se não informado
+    const reportPeriod = startDate ? new Date(startDate) : new Date();
+
     const report = this.salesReportRepo.create({
-      period: new Date(startDate),
+      period: reportPeriod,
       totalSales,
       productsSold,
       filePath,

@@ -1,13 +1,29 @@
-import { Controller, Get, Post, Body, Param, NotFoundException, Res, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Param,
+  NotFoundException,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { SalesReportsService } from './sales_reports.service';
 import { CreateSalesReportDto } from './dto/create-sales_report.dto';
 import { Response } from 'express';
 import * as fs from 'fs';
 import * as path from 'path';
-import { ApiTags, ApiResponse, ApiNotFoundResponse, ApiOperation, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiResponse,
+  ApiNotFoundResponse,
+  ApiOperation,
+  ApiBearerAuth,
+  ApiBody,
+} from '@nestjs/swagger';
 import { AuthenticationGuard } from 'src/utility/guards/authentication.guard';
 
-@ApiTags('Sales Reports')
+@ApiTags('Relatórios de vendas')
 @Controller('sales-reports')
 export class SalesReportsController {
   constructor(private readonly salesReportsService: SalesReportsService) {}
@@ -15,7 +31,8 @@ export class SalesReportsController {
   @ApiBearerAuth()
   @UseGuards(AuthenticationGuard)
   @Post()
-  @ApiOperation({ summary: 'Gerar um novo relatório de vendas' })
+  @ApiOperation({ summary: 'Gerar um novo relatório de vendas com filtros opcionais: data de iníco, de fim, período (fim - início), por status do pedido e por cliente.' })
+  @ApiBody({ type: CreateSalesReportDto })
   @ApiResponse({ status: 201, description: 'Relatório criado com sucesso.' })
   async create(@Body() createSalesReportDto: CreateSalesReportDto) {
     return await this.salesReportsService.create(createSalesReportDto);
@@ -33,7 +50,6 @@ export class SalesReportsController {
   @UseGuards(AuthenticationGuard)
   @Get('single/:id')
   @ApiOperation({ summary: 'Obter um relatório de vendas por ID' })
-  @ApiParam({ name: 'id', description: 'ID do relatório' })
   @ApiNotFoundResponse({ description: 'Relatório não encontrado.' })
   async findOne(@Param('id') id: string) {
     return await this.salesReportsService.findOne(+id);
@@ -43,7 +59,6 @@ export class SalesReportsController {
   @UseGuards(AuthenticationGuard)
   @Get(':id/download')
   @ApiOperation({ summary: 'Download do arquivo CSV do relatório' })
-  @ApiParam({ name: 'id', description: 'ID do relatório' })
   @ApiNotFoundResponse({ description: 'Arquivo do relatório não encontrado.' })
   async downloadReport(@Param('id') id: string, @Res() res: Response) {
     const report = await this.salesReportsService.findOne(+id);
