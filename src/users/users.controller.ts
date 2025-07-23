@@ -9,7 +9,7 @@ import { AuthenticationGuard } from '../../src/utility/guards/authentication.gua
 import { AuthorizeGuard } from '../../src/utility/guards/authorization.guard';
 import { UserRole } from 'src/utility/common/user-roles.enum';
 import { CurrentUser } from 'src/utility/decorators/current-user.decorator';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Usuários')
 @Controller('users')
@@ -127,6 +127,7 @@ export class UsersController {
     };
   }
 
+  @ApiBearerAuth()
   @UseGuards(AuthenticationGuard, AuthorizeGuard([UserRole.ADMIN]))
   @Get('all')
   @ApiOperation({ summary: 'Retorna todos os usuários (somente admin)' })
@@ -162,6 +163,7 @@ export class UsersController {
     };
   }
 
+  @ApiBearerAuth()
   @UseGuards(AuthenticationGuard)
   @Get('single/:id')
   @ApiOperation({ summary: 'Retorna um usuário pelo ID (autorização incluída)' })
@@ -205,6 +207,7 @@ export class UsersController {
     throw new UnauthorizedException('Acesso negado.');
   }
 
+  @ApiBearerAuth()
   @UseGuards(AuthenticationGuard)
   @Patch(':id')
   @ApiOperation({ summary: 'Atualiza os dados de um usuário pelo ID' })
@@ -248,6 +251,8 @@ export class UsersController {
     }
     throw new UnauthorizedException('Você só pode editar sua própria conta.');
   }
+
+  @ApiBearerAuth()
   @UseGuards(AuthenticationGuard)
   @Delete(':id')
   @ApiOperation({ summary: 'Remove um usuário pelo ID' })
@@ -285,6 +290,7 @@ export class UsersController {
     throw new UnauthorizedException('Você só pode excluir sua própria conta.');
   }
 
+  @ApiBearerAuth()
   @UseGuards(AuthenticationGuard)
   @Get('me')
   @ApiOperation({ summary: 'Retorna os dados do usuário atual autenticado' })

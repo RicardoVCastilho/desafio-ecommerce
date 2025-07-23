@@ -8,13 +8,15 @@ import { AuthenticationGuard } from 'src/utility/guards/authentication.guard';
 import { AuthorizeGuard } from 'src/utility/guards/authorization.guard';
 import { UserRole } from 'src/utility/common/user-roles.enum';
 import { CategoryEntity } from './entities/category.entity';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Categorias')
 @Controller('categories')
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) { }
 
+  @ApiBearerAuth()
+  @UseGuards(AuthenticationGuard, AuthorizeGuard([UserRole.ADMIN]))
   @Post()
   @ApiOperation({ summary: 'Cria uma nova categoria (somente admin)' })
   @ApiResponse({
@@ -56,6 +58,8 @@ export class CategoriesController {
     };
   }
 
+  @ApiBearerAuth()
+  @UseGuards(AuthenticationGuard)
   @Get('all')
   @ApiOperation({ summary: 'Retorna todas as categorias' })
   @ApiResponse({
@@ -94,6 +98,8 @@ export class CategoriesController {
     };
   }
 
+  @ApiBearerAuth()
+  @UseGuards(AuthenticationGuard)
   @Get('single/:id')
   @ApiOperation({ summary: 'Retorna uma categoria pelo ID' })
   @ApiResponse({
@@ -130,7 +136,8 @@ export class CategoriesController {
     };
   }
 
-@UseGuards(AuthenticationGuard, AuthorizeGuard([UserRole.ADMIN]))
+  @ApiBearerAuth()
+  @UseGuards(AuthenticationGuard, AuthorizeGuard([UserRole.ADMIN]))
   @Patch(':id')
   @ApiOperation({ summary: 'Atualiza uma categoria pelo ID (somente admin)' })
   @ApiResponse({
@@ -171,7 +178,8 @@ export class CategoriesController {
     };
   }
 
-  @UseGuards(AuthenticationGuard, AuthorizeGuard([UserRole.ADMIN]))
+  @ApiBearerAuth()
+  @UseGuards(AuthenticationGuard)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Remove uma categoria pelo ID (somente admin)' })

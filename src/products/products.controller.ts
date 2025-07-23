@@ -8,13 +8,14 @@ import { AuthorizeGuard } from 'src/utility/guards/authorization.guard';
 import { CurrentUser } from 'src/utility/decorators/current-user.decorator';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { ProductEntity } from './entities/product.entity';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Produtos')
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) { }
 
+  @ApiBearerAuth()
   @UseGuards(AuthenticationGuard, AuthorizeGuard([UserRole.ADMIN]))
   @Post()
   @ApiOperation({ summary: 'Cria um novo produto (somente admin)' })
@@ -64,6 +65,8 @@ export class ProductsController {
     };
   }
 
+  @ApiBearerAuth()
+  @UseGuards(AuthenticationGuard)
   @Get('all')
   @ApiOperation({ summary: 'Retorna todos os produtos' })
   @ApiResponse({
@@ -109,6 +112,8 @@ export class ProductsController {
     };
   }
 
+  @ApiBearerAuth()
+  @UseGuards(AuthenticationGuard)
   @Get('single/:id')
   @ApiOperation({ summary: 'Retorna um produto pelo ID' })
   @ApiResponse({
@@ -152,7 +157,8 @@ export class ProductsController {
     };
   }
 
- @UseGuards(AuthenticationGuard, AuthorizeGuard([UserRole.ADMIN]))
+  @ApiBearerAuth()
+  @UseGuards(AuthenticationGuard, AuthorizeGuard([UserRole.ADMIN]))
   @Patch(':id')
   @ApiOperation({ summary: 'Atualiza um produto pelo ID (somente admin)' })
   @ApiResponse({
@@ -201,6 +207,7 @@ export class ProductsController {
     };
   }
 
+  @ApiBearerAuth()
   @UseGuards(AuthenticationGuard, AuthorizeGuard([UserRole.ADMIN]))
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)

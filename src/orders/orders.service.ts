@@ -71,7 +71,6 @@ async create(createOrderDto: CreateOrderDto): Promise<OrderEntity> {
         product: products.find(p => p.id === item.productId),
         quantity: item.quantity,
         unitPrice: item.unitPrice,
-        subtotal: item.subtotal,
         order: savedOrder,
       }),
     );
@@ -117,4 +116,18 @@ async create(createOrderDto: CreateOrderDto): Promise<OrderEntity> {
       throw new NotFoundException(`Pedido #${id} não encontrado`);
     }
   }
+
+  async processPayment(orderId: number, paymentSuccess: boolean): Promise<OrderEntity> {
+  const order = await this.findOne(orderId);
+  if (!order) throw new NotFoundException(`Pedido #${orderId} não encontrado`);
+
+  if (paymentSuccess) {
+    order.status = OrderStatus.PAID;
+  } else {
+    order.status = OrderStatus.PAYMENT_FAILED;
+  }
+
+  return this.orderRepository.save(order);
+}
+
 }

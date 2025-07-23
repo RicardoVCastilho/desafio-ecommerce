@@ -17,16 +17,14 @@ async function bootstrap() {
     }),
   );
 
-  // Swagger Configuração
   const config = new DocumentBuilder()
     .setTitle('API - Ecommerce do desafio da Loomi') 
     .setDescription('Documentação da API Ecommerce do desafio da Loomi')
     .setVersion('1.0')
-    .addTag('users')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document); // Rota da documentação
+  SwaggerModule.setup('api/docs', app, document);
 
   const dataSource = app.get(DataSource);
   if (!dataSource.isInitialized) {

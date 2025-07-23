@@ -1,107 +1,115 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, Between } from 'typeorm';
 import { SalesReportEntity } from './entities/sales_report.entity';
-import { Repository, DataSource } from 'typeorm';
 import { CreateSalesReportDto } from './dto/create-sales_report.dto';
-import { createObjectCsvWriter } from 'csv-writer';
-import * as path from 'path';
+import { OrderEntity } from 'src/orders/entities/order.entity';
+import { OrderItemEntity } from 'src/order-items/entities/order-item.entity';
+import { OrderStatus } from 'src/utility/common/order-status.enum';
 import * as fs from 'fs';
-import { UpdateSalesReportDto } from './dto/update-sales_report.dto';
+import * as path from 'path';
+import { createObjectCsvWriter } from 'csv-writer';
 
 @Injectable()
 export class SalesReportsService {
   constructor(
     @InjectRepository(SalesReportEntity)
-    private salesReportRepository: Repository<SalesReportEntity>,
-    private dataSource: DataSource,
+    private readonly salesReportRepo: Repository<SalesReportEntity>,
+
+    @InjectRepository(OrderEntity)
+    private readonly orderRepo: Repository<OrderEntity>,
+
+    @InjectRepository(OrderItemEntity)
+    private readonly orderItemRepo: Repository<OrderItemEntity>,
   ) { }
 
-  async create(createDto: CreateSalesReportDto) {
-    const startDate = new Date(createDto.startDate);
-    const endDate = new Date(createDto.endDate);
+  async create(createSalesReportDto: CreateSalesReportDto): Promise<SalesReportEntity> {
+    const { startDate, endDate } = createSalesReportDto;
 
-    // Consulta SQL agregando vendas por produto
-    const result = await this.dataSource.query(
-      `
-SELECT
-  p.name AS product,
-  SUM(oi.quantity) AS total_quantity_sold,
-  SUM(oi.quantity * oi."unitPrice") AS total_revenue
-FROM order_items oi
-JOIN products p ON p.id = oi.product_id
-JOIN orders o ON o.id = oi.order_id
-WHERE o."orderDate" BETWEEN $1 AND $2
-GROUP BY p.name
-ORDER BY total_quantity_sold DESC
+    // Busca pedidos pagos dentro do período com itens e produtos relacionados
+    const orders = await this.orderRepo.find({
+      where: {
+        orderDate: Between(new Date(startDate), new Date(endDate)),
+        status: OrderStatus.PAID,
+      },
+      relations: ['items', 'items.product'],
+    });
 
-    `,
-      [startDate, endDate],
-    );
+    if (!orders.length) {
+      throw new NotFoundException('Nenhuma venda encontrada no período informado.');
+    }
 
-    // Diretório para salvar o CSV
-    const fileName = `report-${Date.now()}.csv`;
-    const filePath = path.join(__dirname, '..', '..', 'reports', fileName);
+    let totalSales = 0;
+    let productsSold = 0;
+
+    // Define tipo para o CSV para o TypeScript
+    const csvData: {
+      orderId: number;
+      productId: number;
+      quantity: number;
+      subtotal: number;
+      createdAt: string;
+    }[] = [];
+
+    for (const order of orders) {
+      for (const item of order.items) {
+        totalSales += Number(item.subtotal);
+        productsSold += item.quantity;
+
+        csvData.push({
+          orderId: order.id,
+          productId: item.product.id,
+          quantity: item.quantity,
+          subtotal: item.subtotal,
+          createdAt: order.orderDate.toISOString(),
+        });
+      }
+    }
+
+    const filename = `sales_report_${Date.now()}.csv`;
+    const filePath = path.join(__dirname, '../../uploads/reports', filename);
+
     fs.mkdirSync(path.dirname(filePath), { recursive: true });
 
     const csvWriter = createObjectCsvWriter({
       path: filePath,
       header: [
-        { id: 'product', title: 'Product' },
-        { id: 'total_quantity_sold', title: 'Quantity Sold' },
-        { id: 'total_revenue', title: 'Total Revenue' },
+        { id: 'orderId', title: 'Order ID' },
+        { id: 'productId', title: 'Product ID' },
+        { id: 'quantity', title: 'Quantity' },
+        { id: 'subtotal', title: 'Subtotal' },
+        { id: 'createdAt', title: 'Created At' },
       ],
     });
 
-    await csvWriter.writeRecords(result);
+    try {
+      await csvWriter.writeRecords(csvData);
+    } catch {
+      throw new InternalServerErrorException('Erro ao gerar o arquivo CSV.');
+    }
 
-    // Cálculo dos valores para salvar no banco
-    const period = startDate;
-    const totalSales = result.reduce((acc, curr) => acc + Number(curr.total_revenue), 0);
-    const productsSold = result.reduce((acc, curr) => acc + Number(curr.total_quantity_sold), 0);
-
-    // Salva no banco o caminho do relatório
-    const report = this.salesReportRepository.create({
-      filePath: filePath,
-      period: period,
-      totalSales: totalSales,
-      productsSold: productsSold,
+    // Cria o registro do relatório no banco
+    const report = this.salesReportRepo.create({
+      period: new Date(startDate),
+      totalSales,
+      productsSold,
+      filePath,
     });
 
-    await this.salesReportRepository.save(report);
-
-    return { message: 'Report generated successfully', report };
+    return this.salesReportRepo.save(report);
   }
 
   async findAll(): Promise<SalesReportEntity[]> {
-    return this.salesReportRepository.find();
+    return this.salesReportRepo.find({ order: { createdAt: 'DESC' } });
   }
 
   async findOne(id: number): Promise<SalesReportEntity> {
-    const report = await this.salesReportRepository.findOneBy({ id });
+    const report = await this.salesReportRepo.findOne({ where: { id } });
+
     if (!report) {
-      throw new NotFoundException(`Relatório com id ${id} não encontrado.`);
+      throw new NotFoundException('Relatório de vendas não encontrado.');
     }
+
     return report;
-  }
-
-  async update(id: number, updateDto: UpdateSalesReportDto): Promise<SalesReportEntity> {
-    const report = await this.salesReportRepository.preload({
-      id,
-      ...updateDto,
-    });
-
-    if (!report) {
-      throw new NotFoundException(`Relatório com id ${id} não encontrado.`);
-    }
-
-    return this.salesReportRepository.save(report);
-  }
-
-  async remove(id: number): Promise<void> {
-    const report = await this.salesReportRepository.findOneBy({ id });
-    if (!report) {
-      throw new NotFoundException(`Relatório com id ${id} não encontrado.`);
-    }
-    await this.salesReportRepository.remove(report);
   }
 }

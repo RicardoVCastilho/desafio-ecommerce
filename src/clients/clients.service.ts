@@ -58,6 +58,13 @@ export class ClientsService {
     return await this.clientRepository.findOneBy({ id });
   }
 
+  async findByUserId(userId: number): Promise<ClientEntity | null> {
+  return this.clientRepository.findOne({
+    where: { user: { id: userId } },
+    relations: ['user'],
+  });
+}
+
   async update(id: number, updateClientDto: UpdateClientDto): Promise<ClientResponseDto> {
     const client = await this.clientRepository.findOne({ where: { id }, relations: ['user'] });
     if (!client) {
