@@ -67,9 +67,6 @@ async confirmEmail(token: string): Promise<string> {
   return 'E-mail confirmado com sucesso!';
 }
 
-
-
-
 async signin(userSignInDto: UserSignInDto): Promise<UserEntity> {
   const userExists = await this.usersRepository
     .createQueryBuilder('users')
@@ -89,12 +86,6 @@ async signin(userSignInDto: UserSignInDto): Promise<UserEntity> {
   delete (userExists as any).password;
   return userExists;
 }
-
-
-
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
-  }
 
   async findAll(): Promise<UserEntity[]>{
     return await this.usersRepository.find();
@@ -117,7 +108,6 @@ async signin(userSignInDto: UserSignInDto): Promise<UserEntity> {
   async findUserByEmail(email: string) {
     return await this.usersRepository.findOneBy({ email });
   }
-
 
 async accessToken(user: UserEntity): Promise<string> {
   const secret = process.env.ACCESS_TOKEN_SECRET_KEY;

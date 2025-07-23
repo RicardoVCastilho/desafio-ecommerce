@@ -32,11 +32,6 @@ export class UsersController {
     return { accessToken, user };
   }
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return 'Olá mundo!';
-  }
-
   @Get('confirm-email')
   async confirmEmail(@Query('token') token: string): Promise<{ message: string }> {
     const message = await this.usersService.confirmEmail(token);
