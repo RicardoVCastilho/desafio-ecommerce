@@ -9,7 +9,7 @@ export class OrderEntity {
   id: number;
 
   @ManyToOne(() => ClientEntity, { eager: true })
-  @JoinColumn({ name: 'client_id' }) // FK personalizada
+  @JoinColumn({ name: 'client_id' }) 
   client: ClientEntity;
 
   @Column({
@@ -27,11 +27,10 @@ export class OrderEntity {
 
   @OneToMany(() => OrderItemEntity, (item) => item.order, {
     cascade: true,
-    eager: true, // 🔁 Recomendado se quiser carregar os itens junto com o pedido
+    eager: true, 
   })
   items: OrderItemEntity[];
 
-  // 🔢 Atualiza total automaticamente baseado nos itens
   @BeforeInsert()
   @BeforeUpdate()
   calculateTotal() {

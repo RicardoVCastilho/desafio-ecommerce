@@ -27,7 +27,7 @@ export class OrdersService {
     @InjectRepository(ProductEntity)
     private readonly productRepository: Repository<ProductEntity>,
 
-    private readonly dataSource: DataSource, // só isso, sem decorator
+    private readonly dataSource: DataSource,
   ) {}
 
 async create(createOrderDto: CreateOrderDto): Promise<OrderEntity> {
@@ -46,7 +46,6 @@ async create(createOrderDto: CreateOrderDto): Promise<OrderEntity> {
       id: In(productIds)
     });
 
-    // Verifica e atualiza estoque
     for (const item of createOrderDto.items) {
       const product = products.find(p => p.id === item.productId);
       if (!product) throw new NotFoundException(`Produto ID ${item.productId} não encontrado`);
@@ -59,7 +58,6 @@ async create(createOrderDto: CreateOrderDto): Promise<OrderEntity> {
       await queryRunner.manager.save(ProductEntity, product);
     }
 
-    // Cria o pedido
     const order = queryRunner.manager.create(OrderEntity, {
       client,
       status: createOrderDto.status ?? OrderStatus.RECEIVED,
@@ -68,7 +66,6 @@ async create(createOrderDto: CreateOrderDto): Promise<OrderEntity> {
 
     const savedOrder = await queryRunner.manager.save(OrderEntity, order);
 
-    // Cria os itens do pedido vinculados à ordem salva
     const orderItems = createOrderDto.items.map(item =>
       queryRunner.manager.create(OrderItemEntity, {
         product: products.find(p => p.id === item.productId),
@@ -91,12 +88,9 @@ async create(createOrderDto: CreateOrderDto): Promise<OrderEntity> {
   }
 }
 
-
-
-
   async findAll(): Promise<OrderEntity[]> {
     return this.orderRepository.find({
-      relations: ['items', 'client'], // Carrega itens e cliente junto
+      relations: ['items', 'client'],
     });
   }
 
