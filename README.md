@@ -1,4 +1,4 @@
-## Ecommerce-desafio Loomi
+## Ecommerce-desafio
  Este projeto é uma API RESTful desenvolvida com NestJS, TypeScript e PostgreSQL, que implementa o backend completo de um ecommerce. A API permite a gestão integral de usuários, clientes, categorias de produtos, produtos, pedidos e itens dos pedidos, além de gerar relatórios de vendas em arquivos no formato CSV.
 
 ## 🚀Tecnologias utilizadas
